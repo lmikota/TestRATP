@@ -62,5 +62,5 @@ jobs:
         cp "$FILE" target/lmikota.jar
 
         curl -T target/lmikota.jar \
-          --user ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
+          --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
           ftp://${{ secrets.FTP_SERVER }}/
