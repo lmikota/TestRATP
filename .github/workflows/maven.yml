@@ -62,5 +62,5 @@ jobs:
         cp "$FILE" target/lmikota.jar
 
         curl -T target/lmikota.jar \
-          --user "f018212f:HTL-Steyr4400" \
-          ftp://rathgeb.at/
+          --user ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
+          ftp://${{ secrets.FTP_SERVER }}/
