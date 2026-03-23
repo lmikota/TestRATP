@@ -28,8 +28,39 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B -DskipTests package --file pom.xml
 
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: Update dependency graph
-      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+    - name: Test
+      run: mvn test
+
+    - name: Report
+      uses: dorny/test-reporter@v2
+      if: always()
+      with:
+        name: Maven Tests
+        path: target/surefire-reports/*.xml
+        reporter: java-junit
+        fail-on-error: true
+
+    - name: Upload JAR Artifact
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: application-jar
+        path: target/*.jar
+
+    - name: Upload JAR via FTP
+      if: success()
+      run: |
+        FILE=$(find target -maxdepth 1 -name "*.jar" | head -n 1)
+
+        if [ -z "$FILE" ]; then
+          echo "Keine JAR-Datei gefunden."
+          exit 1
+        fi
+
+        cp "$FILE" target/lmikota.jar
+
+        curl -T target/lmikota.jar \
+          --user "f018212f:HTL-Steyr4400" \
+          ftp://rathgeb.at/
